@@ -1,0 +1,28 @@
+Vagrant.configure("2") do |config|
+    # Define the web01 VM
+    config.vm.define "web01" do |web01|
+      web01.vm.box = "ubuntu/focal64"
+      web01.vm.network "private_network", ip: "192.168.56.18"
+      web01.vm.hostname = "web01"
+    end
+  
+    # Define the web02 VM
+    config.vm.define "web02" do |web02|
+      web02.vm.box = "ubuntu/focal64"
+      web02.vm.network "private_network", ip: "192.168.56.19"
+      web02.vm.hostname = "web02"
+    end
+  
+    # Define the db01 VM
+    config.vm.define "db01" do |db01|
+      db01.vm.box = "eurolinux-vagrant/centos-stream-9"
+      db01.vm.network "private_network", ip: "192.168.56.20"
+      db01.vm.hostname = "db01"
+      db01.vm.provision "shell", inline: <<-SHELL
+        yum install -y wget unzip mariadb-server -y
+        systemctl start mariadb
+        systemctl enable mariadb
+      SHELL
+    end
+  end
+  
