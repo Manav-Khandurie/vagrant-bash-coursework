@@ -1,0 +1,116 @@
+yum update -y
+yum install epel-release -y
+ yum install git mariadb-server -y
+systemctl start mariadb
+systemctl enable mariadb
+
+grant all privileges on accounts.* TO 'admin'@'%' identified by 'manav';
+
+git clone -b main https://github.com/hkhcoder/vprofile-project.git
+cd vprofile-project
+mysql -u root -pmanav accounts < src/main/resources/db_backup.sql
+mysql -u root -pmanav accounts
+systemctl restart mariadb
+
+
+
+
+
+------------
+sudo -i
+sudo dnf install epel-release -y
+sudo dnf install memcached -y
+sudo systemctl start memcached
+sudo systemctl enable memcached
+sudo systemctl status memcached
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/sysconfig/memcached
+systemctl restart memcached
+
+-------------
+
+sudo -i
+yum update -y
+yum install epel-release -y
+yum install wget -y
+
+cd /tmp/
+dnf -y install centos-release-rabbitmq-38
+dnf --enablerepo=centos-rabbitmq-38 -y install rabbitmq-server
+systemctl enable --now rabbitmq-server
+systemctl restart rabbitmq-server
+
+
+sudo sh -c 'echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config'
+sudo rabbitmqctl add_user test test
+sudo rabbitmqctl set_user_tags test administrator
+sudo systemctl restart rabbitmq-server
+
+-------------
+
+
+sudo -i
+yum update -y
+yum install epel-release -y
+dnf -y install java-11-openjdk java-11-openjdk-devel
+dnf install git maven wget -y
+cd /tmp/
+wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.75/bin/apache-tomcat-9.0.75.tar.gz
+tar xzvf apache-tomcat-9.0.75.tar.gz
+useradd --home-dir /usr/local/tomcat --shell /sbin/nologin tomcat
+cp -r /tmp/apache-tomcat-9.0.75/* /usr/local/tomcat/
+
+[Unit]
+Description=Tomcat
+After=network.target
+[Service]
+User=tomcat
+WorkingDirectory=/usr/local/tomcat
+Environment=JRE_HOME=/usr/lib/jvm/jre
+Environment=JAVA_HOME=/usr/lib/jvm/jre
+Environment=CATALINA_HOME=/usr/local/tomcat
+Environment=CATALINE_BASE=/usr/local/tomcat
+ExecStart=/usr/local/tomcat/bin/catalina.sh run
+ExecStop=/usr/local/tomcat/bin/shutdown.sh
+SyslogIdentifier=tomcat-%i
+[Install]
+WantedBy=multi-user.target
+
+
+systemctl daemon-reload
+systemctl start tomcat
+systemctl enable tomcat
+
+git clone -b main https://github.com/hkhcoder/vprofile-project.git
+cd vprofile-project
+
+
+
+
+
+
+
+
+----------------
+
+
+sudo -i
+apt update -y
+apt upgrade -y
+apt install nginx -y
+vi /etc/nginx/sites-available/vproapp
+
+
+upstream vproapp {
+server app01:8080;
+}
+server {
+listen 80;
+location / {
+proxy_pass http://vproapp;
+}
+}
+
+
+rm -rf /etc/nginx/sites-enabled/default
+
+
